@@ -6,6 +6,16 @@
 
 import 'style-loader!./cmpui.less';
 
+// shmoop
+import 'style-loader!./shmoop/shmoop.less';
+import shmoopCtrl from './shmoop/shmoop';
+import shmoopView from 'html-loader?minimize=true!./shmoop/shmoop.html';
+
+// privacy
+import 'style-loader!./privacy/privacy.less';
+import privacyCtrl from './privacy/privacy';
+import privacyView from 'html-loader?minimize=true!./privacy/privacy.html';
+
 // main
 import 'style-loader!./main/main.less';
 import mainCtrl from './main/main';
@@ -47,6 +57,8 @@ window.__cmpui = new function (win) {
 
     // These views represent the 4 screens in the consent UI flow
     var views = {
+        shmoop: {html: shmoopView, ctrl: shmoopCtrl},
+        privacy: {html: privacyView, ctrl: privacyCtrl},
         main: {html: mainView, ctrl: mainCtrl},
         purposes: {html: purposesView, ctrl: purposesCtrl},
         vendors: {html: vendorsView, ctrl: vendorsCtrl},
@@ -96,7 +108,17 @@ window.__cmpui = new function (win) {
             vendorsCtrl.setVendors(vendorList.vendors);
 
             // render
-            renderView(skipInitialScreen ? 'purposes' : 'main');
+            renderView(skipInitialScreen ? 'purposes' : 'shmoop');
+
+            // Leave button
+            var closeButton = document.getElementById('refuseConsent');
+            closeButton.onclick = function () {
+                // reject all consents
+                consentData.setAllPurposeConsents(false);
+                consentData.setAllVendorConsents(false);
+                // save
+                __cmpui('save');
+            };
         });
     };
 
@@ -120,11 +142,11 @@ window.__cmpui = new function (win) {
 
         if (redirectUrl) {
             if (isValidRedirectUrl(redirectUrl)) {
-                // check for an EuConsent query parameter.  If it exists, then the
+                // check for an euconsent query parameter.  If it exists, then the
                 // user has previously provided their consents.  This scenario occurs
                 // when the user chooses to update or revoke their existing consents.
                 // Typically this option is available from the publishers privacy page.
-                var consentString = queryParams.EuConsent;
+                var consentString = queryParams.euconsent;
                 if (consentString) {
                     // Update the consentData model with the existing consent string
                     consentData.setAll(consentString);
@@ -160,7 +182,7 @@ window.__cmpui = new function (win) {
                     // store the callId for use when sending the __cmpUIReturn message
                     renderConsentUICallId = callId;
 
-                    // check for a parameter.EuConsent value.  If it exists, then the
+                    // check for a parameter.euconsent value.  If it exists, then the
                     // user has previously provided their consents.  This scenario occurs
                     // when the user chooses to update or revoke their existing consents.
                     // Typically this option is avaiable from the publishers privacy page.
@@ -189,7 +211,7 @@ window.__cmpui = new function (win) {
             // passing the consent string in query parameters
             var urlHasParams = redirectUrl.indexOf('?') > -1;
             var queryParamStr = urlHasParams ? '&' : '?';
-            queryParamStr += 'EuConsent=' + encodeURIComponent(consentString);
+            queryParamStr += 'euconsent=' + encodeURIComponent(consentString);
 
             win.location.replace(redirectUrl + queryParamStr);
             return;

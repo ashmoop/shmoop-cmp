@@ -62,7 +62,7 @@ html, body {
   display: flex;
   flex-direction: column;
   box-sizing: content-box;
-  overflow: scroll;
+  overflow: auto;
   max-width: 1000px;
   width: 100%;
   height: 100%;
@@ -77,6 +77,18 @@ html, body {
     background: #000000;
     height: 82px;
     padding: 0 40px;
+
+    .close {
+      position: absolute;
+      right: 45px;
+      top: 15px;
+      color: #fff;
+      background-color: rgba(62, 62, 62, 0.8);
+      font-size: 30px;
+      padding: 5px 15px 7px;
+      border-radius: 34px;
+      cursor: pointer;
+    }
 
     .cmp-header-title {
       color: #ffffff;
@@ -186,6 +198,10 @@ html, body {
 @media only screen and (max-width: 715px) {
   .cmp {
     border-radius: 0;
+
+    .cmp-header-title {
+      font-size: 20px !important;
+    }
 
     .cmp-body {
       .cmp-view {
